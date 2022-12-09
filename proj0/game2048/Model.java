@@ -113,11 +113,48 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        if (atLeastOneMoveExists(this.board)) {
+            this.board.setViewingPerspective(side);
+            for(int col = 0 ; col < this.board.size(); col++){
+                // Starting from top
+                for (int row = this.board.size()-1; row >= 0; row--){
+                    // this square is not occupied, try filling the square with next available filled square
+                    if (this.board.tile(col, row) == null) {
+                        // find nearest number to occupy it
+                        for (int drow = row - 1; drow >= 0; drow--) {
+                            if (this.board.tile(col, drow) != null) {
+                                this.board.move(col, row, this.board.tile(col, drow));
+                                // move done, we have changed and break to check possible merge
+                                changed = true;
+                                break;
+                            }
+                        }
+                    }
+                    // The empty square cannot be filled. Move to next col
+                    if (this.board.tile(col, row) == null) break;
+                    // The empty square is filled or the square is not empty at all, find possible merge
+                    for (int drow = row-1; drow >= 0; drow--){
+                        if (this.board.tile(col, drow) != null){
+                            // Same value, can merge
+                            if (this.board.tile(col, drow).value() == this.board.tile(col, row).value()){
+                                this.board.move(col, row, this.board.tile(col, drow));
+                                // merge done, update score, changed and move to next square down
+                                this.score += (this.board.tile(col, row).value());
+                                changed=true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
 
         checkGameOver();
         if (changed) {
             setChanged();
         }
+        this.board.setViewingPerspective(Side.NORTH);
         return changed;
     }
 
@@ -138,6 +175,13 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+        for (int i = 0; i < b.size(); i++){
+            for (int j = 0; j < b.size(); j++){
+                if (b.tile(i, j) == null){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -148,6 +192,13 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
+        for (int i = 0; i < b.size(); i++){
+            for (int j = 0; j < b.size(); j++){
+                if (b.tile(i, j)!=null && b.tile(i,j).value()==MAX_PIECE){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -159,6 +210,22 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        for (int i = 0; i < b.size(); i++){
+            for (int j = 0; j < b.size(); j++){
+                // empty square found
+                if (b.tile(i, j) == null){
+                    return true;
+                }
+                int[][] directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+                // check adjacent
+                for (int[] dir : directions){
+                    int new_i = i + dir[0], new_j = j + dir[1];
+                    if (new_i < b.size() && new_i>0 && new_j <b.size() && new_j >0 && b.tile(new_i, new_j)!=null){
+                        if (b.tile(new_i, new_j).value() == b.tile(i, j).value()) return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 
