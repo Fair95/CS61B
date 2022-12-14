@@ -29,12 +29,11 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 		if (front + 1 == capacity) {
 			// We put it at pos 1 cuz front sits at 0 in extended arr
 			System.arraycopy(arr, 0, newArr, 1, size);
-		}
-		// When front + 1 will not immediately wrap around, we need two copy steps
-		// 2nd start         2nd end     1st start       1st end
-		// |                   |             |             |
-		// x         x x x x x x front(back) x      x x    x
-		else {
+		} else {
+			// When front + 1 will not immediately wrap around, we need two copy steps
+			// 2nd start         2nd end     1st start       1st end
+			// |                   |             |             |
+			// x         x x x x x x front(back) x      x x    x
 			// copy from front + 1 to the end
 			// We put it at pos 1 cuz front sits at 0 in extended arr
 			System.arraycopy(arr, front + 1, newArr, 1, arr.length - (front + 1));
@@ -95,18 +94,16 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 		//    x x x x x x x back _ _ ... _ _ front
 		if (front + 1 > capacity) {
 			System.arraycopy(arr, 0, newArr, 1, size);
-		}
-		//                start         end
-		//                  |            |
-		//    _ _ ... _ _ front x x x x back _ _ ... _ _
-		else if (front < back) {
+		} else if (front < back) {
+			//                start         end
+			//                  |            |
+			//    _ _ ... _ _ front x x x x back _ _ ... _ _
 			System.arraycopy(arr, front + 1, newArr, 1, size);
-		}
-		// When front + 1 will not immediately wrap around, we need two copy steps
-		// 2nd start         2nd end           1st start       1st end
-		// |                   |                   |             |
-		// x         x x x x x x back _ _ ... _ _ front  x x      x    x
-		else {
+		} else {
+			// When front + 1 will not immediately wrap around, we need two copy steps
+			// 2nd start         2nd end           1st start       1st end
+			// |                   |                   |             |
+			// x         x x x x x x back _ _ ... _ _ front  x x      x    x
 			// We put it at pos 1 cuz front sits at 0 in extended arr
 			System.arraycopy(arr, front + 1, newArr, 1, arr.length - (front + 1));
 			// copy the rest from 0 to back-1 (because back pointing to non-occupied index)
@@ -127,7 +124,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 		front = (front == capacity - 1) ? 0 : front + 1;
 		T returnValue = arr[front];
 		size--;
-		if (size < capacity / 4 && size >= 16) {
+		if (size < capacity / 4 && size > 16) {
 			shrinkArray();
 		}
 		return returnValue;
