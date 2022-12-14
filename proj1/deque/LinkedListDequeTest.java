@@ -4,6 +4,8 @@ import edu.princeton.cs.algs4.StdRandom;
 import jh61b.junit.In;
 import org.junit.Test;
 
+import java.util.Iterator;
+
 import static org.junit.Assert.*;
 
 
@@ -240,6 +242,35 @@ public class LinkedListDequeTest {
                 process = process.concat("size()\n");
                 assertEquals(process, size, sizeL2);
             }
+        }
+    }
+
+    @Test
+    public void IteratorTest() {
+        LinkedListDeque<Integer> L = new LinkedListDeque<>();
+        ArrayDeque<Integer> L2 = new ArrayDeque<>();
+
+        int N = 50;
+        String process = "";
+        for (int i = 0; i < N; i += 1) {
+            int operationNumber = StdRandom.uniform(0, 2);
+            if (operationNumber == 0) {
+                // addFirst
+                int randVal = StdRandom.uniform(0, 100);
+                L.addFirst(randVal);
+                L2.addFirst(randVal);
+                process = process.concat("addFirst(" + randVal + ")\n");
+            } else if (operationNumber == 1) {
+                // addLast
+                int randVal = StdRandom.uniform(0, 100);
+                L.addLast(randVal);
+                L2.addLast(randVal);
+                process = process.concat("addLast(" + randVal + ")\n");
+            }
+        }
+        Iterator<Integer> it = L2.iterator();
+        for (Integer i : L) {
+            assertEquals(i, it.next());
         }
     }
 }

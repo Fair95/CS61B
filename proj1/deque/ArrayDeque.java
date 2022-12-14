@@ -1,6 +1,5 @@
 package deque;
 
-import java.lang.reflect.Array;
 import java.util.Iterator;
 
 public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
@@ -149,7 +148,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 	private class ArrayDequeIterator implements Iterator<T> {
 		private int loc;
 
-		public ArrayDequeIterator() {
+		ArrayDequeIterator() {
 			loc = 0;
 		}
 

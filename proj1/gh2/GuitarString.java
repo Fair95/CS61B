@@ -24,7 +24,7 @@ public class GuitarString {
         //       better accuracy, use the Math.round() function before casting.
         //       Your should initially fill your buffer array with zeros.
         buffer = new LinkedListDeque<>();
-        for (int i = 0; i < (int) Math.round(SR/frequency); i++){
+        for (int i = 0; i < (int) Math.round(SR / frequency); i++) {
             buffer.addLast(0.0);
         }
     }
@@ -41,9 +41,9 @@ public class GuitarString {
         //       are different from each other. It means you should repeatedly call
         //       Math.random() - 0.5 to generate new random numbers for each array index.
         int size = buffer.size();
-        for (int i = 0; i < size; i++){
+        for (int i = 0; i < size; i++) {
             buffer.removeFirst();
-            double r = Math.random()-0.5;
+            double r = Math.random() - 0.5;
             buffer.addLast(r);
         }
         assert buffer.size() == size;
