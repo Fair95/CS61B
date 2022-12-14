@@ -18,8 +18,8 @@ public class ArrayDeque<T> {
                 arr = (T[]) new Object[capacity];
         }
         private void extendArray(){
-                capacity *= 2;
-                T[] newArr = (T[]) new Object[capacity];
+                int newCapacity = capacity * 2;
+                T[] newArr = (T[]) new Object[newCapacity];
                 // When front + 1 will wrap around, we only need to copy once
                 //  start        end
                 //    |           |
@@ -42,9 +42,11 @@ public class ArrayDeque<T> {
                 }
 
                 arr = newArr;
+                capacity = newCapacity;
                 // make sure front and back pointing to non-occupied index
                 front = 0;
                 back = size+1;
+//                System.out.println("Expanded-> capacity:" + this.capacity + " size:"+this.size());
         }
         public void addFirst(T item){
                 arr[front] = item;
@@ -73,14 +75,20 @@ public class ArrayDeque<T> {
                 System.out.print("\n");
         }
         private void shrinkArray(){
-                capacity /= 2;
-                T[] newArr = (T[]) new Object[capacity];
+                int newCapacity = capacity / 2;
+                T[] newArr = (T[]) new Object[newCapacity];
                 // When front + 1 will wrap around, we only need to copy once
                 //  start        end
                 //    |           |
                 //    x x x x x x x back _ _ ... _ _ front
                 if (front + 1 > capacity){
-                        System.arraycopy(arr, 0, newArr, 0, size);
+                        System.arraycopy(arr, 0, newArr, 1, size);
+                }
+                //                start         end
+                //                  |            |
+                //    _ _ ... _ _ front x x x x back _ _ ... _ _
+                else if (front < back){
+                        System.arraycopy(arr, front+1, newArr, 1, size);
                 }
                 // When front + 1 will not immediately wrap around, we need two copy steps
                 // 2nd start         2nd end           1st start       1st end
@@ -94,14 +102,16 @@ public class ArrayDeque<T> {
                         System.arraycopy(arr, 0, newArr, arr.length-front, back);
                 }
                 arr = newArr;
+                capacity = newCapacity;
                 // make sure front and back pointing to non-occupied index
                 front = 0;
                 back = size+1;
+//                System.out.println("Shrinked-> capacity:" + this.capacity + " size:"+this.size());
         }
         public T removeFirst(){
                 if (this.isEmpty()) return null;
-                T returnValue = arr[front];
                 front = (front==capacity-1) ? 0:front+1;
+                T returnValue = arr[front];
                 size --;
                 if (size < capacity/4 && size>=16) {
                         shrinkArray();
@@ -110,8 +120,8 @@ public class ArrayDeque<T> {
         }
         public T removeLast(){
                 if (this.isEmpty()) return null;
-                T returnValue = arr[back];
                 back = (back==0) ? capacity-1:back-1;
+                T returnValue = arr[back];
                 size --;
                 if (size < capacity/4 && size>=16) {
                         shrinkArray();

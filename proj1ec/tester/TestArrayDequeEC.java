@@ -5,7 +5,7 @@ import student.StudentArrayDeque;
 import edu.princeton.cs.algs4.StdRandom;
 public class TestArrayDequeEC {
     @Test
-    public void TestBuggyAList(){
+    public void RandomisedTest(){
         StudentArrayDeque<Integer> L = new StudentArrayDeque<>();
         ArrayDequeSolution<Integer> L2 = new ArrayDequeSolution<>();
 
@@ -28,16 +28,16 @@ public class TestArrayDequeEC {
             }else if (operationNumber == 2){
                 // removeFirst
                 if (!L.isEmpty()){
-                    int first = L.removeFirst();
-                    int firstL2 = L2.removeFirst();
+                    Integer first = L.removeFirst();
+                    Integer firstL2 = L2.removeFirst();
                     process = process.concat("removeFirst()\n");
                     assertEquals(process, first, firstL2);
                 }
             } else if (operationNumber == 3) {
                 // removeLast
                 if (!L.isEmpty()){
-                    int last = L.removeLast();
-                    int lastL2 = L2.removeLast();
+                    Integer last = L.removeLast();
+                    Integer lastL2 = L2.removeLast();
                     process = process.concat("removeLast()\n");
                     assertEquals(process, last, lastL2);
                 }
@@ -46,8 +46,8 @@ public class TestArrayDequeEC {
                 // get
                 if (!L.isEmpty()) {
                     int randIndex = StdRandom.uniform(0, L.size());
-                    int item = L.get(randIndex);
-                    int itemL2 = L2.get(randIndex);
+                    Integer item = L.get(randIndex);
+                    Integer itemL2 = L2.get(randIndex);
                     process = process.concat(String.format("get(%d)\n",randIndex));
                     assertEquals(process, item, itemL2);
 
