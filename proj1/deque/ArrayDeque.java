@@ -1,8 +1,9 @@
 package deque;
 
 import java.lang.reflect.Array;
+import java.util.Iterator;
 
-public class ArrayDeque<T> {
+public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         private int size;
         private int front;
         private int back;
@@ -48,6 +49,7 @@ public class ArrayDeque<T> {
                 back = size+1;
 //                System.out.println("Expanded-> capacity:" + this.capacity + " size:"+this.size());
         }
+        @Override
         public void addFirst(T item){
                 arr[front] = item;
                 front = (front==0) ? capacity-1:front-1;
@@ -57,6 +59,7 @@ public class ArrayDeque<T> {
                        extendArray();
                 }
         }
+        @Override
         public void addLast(T item){
                 arr[back] = item;
                 back = (back==capacity-1) ? 0:back+1;
@@ -66,8 +69,9 @@ public class ArrayDeque<T> {
                         extendArray();
                 }
         }
-        public boolean isEmpty() {return size == 0;}
+        @Override
         public int size(){return size;}
+        @Override
         public void printDeque(){
                 for (int i = 0; i < size; i++){
                         System.out.print(arr[(front+1+i)%capacity] + " ");
@@ -108,6 +112,7 @@ public class ArrayDeque<T> {
                 back = size+1;
 //                System.out.println("Shrinked-> capacity:" + this.capacity + " size:"+this.size());
         }
+        @Override
         public T removeFirst(){
                 if (this.isEmpty()) return null;
                 front = (front==capacity-1) ? 0:front+1;
@@ -118,6 +123,7 @@ public class ArrayDeque<T> {
                 }
                 return returnValue;
         }
+        @Override
         public T removeLast(){
                 if (this.isEmpty()) return null;
                 back = (back==0) ? capacity-1:back-1;
@@ -128,9 +134,44 @@ public class ArrayDeque<T> {
                 }
                 return returnValue;
         }
+        public class ArrayDequeIterator implements Iterator<T> {
+                private int loc;
+                public ArrayDequeIterator(){
+                        loc = 0;
+                }
+
+                @Override
+                public boolean hasNext() {
+                        return loc < size;
+                }
+
+                @Override
+                public T next() {
+                        T returnValue = get(loc);
+                        loc ++;
+                        return returnValue;
+                }
+        }
+        @Override
         public T get(int index){
                 if (index >= size) return null;
                 return arr[(front+1+index) % capacity];
+        }
+        public Iterator<T> iterator(){
+                return new ArrayDequeIterator();
+        }
+        @Override
+        public boolean equals(Object o){
+                if (this == o) return true;
+                if (o instanceof Deque){
+                        Deque<T> dq = (Deque<T>) o;
+                        if (this.size()!=dq.size()) return false;
+                        for (int i = 0; i< dq.size(); i++){
+                                if (!dq.get(i).equals(this.get(i))) return false;
+                        }
+                        return true;
+                }
+                return false;
         }
 
 }
