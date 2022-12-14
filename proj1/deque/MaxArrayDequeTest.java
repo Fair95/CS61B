@@ -1,28 +1,31 @@
 package deque;
 
 import org.junit.Test;
+
 import java.util.Comparator;
+
 import static org.junit.Assert.*;
 
 public class MaxArrayDequeTest {
-    public class StringComparator implements Comparator<String>{
+    public class StringComparator implements Comparator<String> {
         @Override
         public int compare(String o1, String o2) {
             return o1.compareTo(o2);
         }
     }
 
-    public class StringLenComparator implements Comparator<String>{
+    public class StringLenComparator implements Comparator<String> {
         @Override
         public int compare(String o1, String o2) {
             return o1.length() - o2.length();
         }
     }
 
-    public class ValueNode implements Comparable<ValueNode>{
+    public class ValueNode implements Comparable<ValueNode> {
         public int value;
         public String name;
-        public ValueNode(int value, String name){
+
+        public ValueNode(int value, String name) {
             this.value = value;
             this.name = name;
         }
@@ -33,7 +36,7 @@ public class MaxArrayDequeTest {
         }
 
         @Override
-        public boolean equals(Object o){
+        public boolean equals(Object o) {
             if (this == o) return true;
             if (o instanceof ValueNode) {
                 ValueNode vn = (ValueNode) o;
@@ -43,14 +46,15 @@ public class MaxArrayDequeTest {
         }
     }
 
-    public class ValueNodeComparator implements Comparator<ValueNode>{
+    public class ValueNodeComparator implements Comparator<ValueNode> {
         @Override
         public int compare(ValueNode o1, ValueNode o2) {
             return o1.compareTo(o2);
         }
     }
+
     @Test
-    public void TestCmpString(){
+    public void TestCmpString() {
         Comparator<String> c1 = new StringComparator();
         Comparator<String> c2 = new StringLenComparator();
         MaxArrayDeque<String> mdq = new MaxArrayDeque<>(c1);
@@ -63,7 +67,7 @@ public class MaxArrayDequeTest {
         assertEquals("CCCCAAA", mdq.max(c2));
     }
 
-    public void TestCmpValueNode(){
+    public void TestCmpValueNode() {
         Comparator<ValueNode> c = new ValueNodeComparator();
         MaxArrayDeque<ValueNode> vdq = new MaxArrayDeque<>(c);
         ValueNode n1 = new ValueNode(10, "boy");

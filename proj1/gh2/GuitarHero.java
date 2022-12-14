@@ -1,4 +1,5 @@
 package gh2;
+
 import edu.princeton.cs.algs4.StdAudio;
 import edu.princeton.cs.algs4.StdDraw;
 
@@ -7,10 +8,10 @@ import java.util.Arrays;
 public class GuitarHero {
     public static final double CONCERT = 440.0;
     public static final String keyboard = "q2we4r5ty7u8i9op-[=zxdcfvgbnjmk,.;/' ";
-    private static double getConcert(int index) {
-        return CONCERT * Math.pow(2, (index-24.0)/12.0);
-    }
 
+    private static double getConcert(int index) {
+        return CONCERT * Math.pow(2, (index - 24.0) / 12.0);
+    }
 
 
     public static void main(String[] args) {
@@ -32,7 +33,7 @@ public class GuitarHero {
 
             /* compute the superposition of samples */
             double sample = 0;
-            for (GuitarString g : gStrings){
+            for (GuitarString g : gStrings) {
                 sample += g.sample();
             }
 
@@ -40,7 +41,7 @@ public class GuitarHero {
             StdAudio.play(sample);
 
             /* advance the simulation of each guitar string by one step */
-            for (GuitarString g : gStrings){
+            for (GuitarString g : gStrings) {
                 g.tic();
             }
         }
