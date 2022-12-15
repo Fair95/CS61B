@@ -273,4 +273,35 @@ public class LinkedListDequeTest {
             assertEquals(i, it.next());
         }
     }
+    @Test
+    /* Tests removing from an empty deque */
+    public void removeResizeTest() {
+        ArrayDeque<Integer> ad1 = new ArrayDeque<>();
+        for (int i = 0; i < 10000; i++) {
+            ad1.addFirst(0);
+        }
+        for (int i = 0; i < 10000; i++) {
+            ad1.removeFirst();
+        }
+        int capacity = ad1.getCapacity();
+        String errorMsg = "  Bad capacity returned when removing from ArrayDeque.\n";
+        errorMsg += "  student capacity returned " + capacity + "\n";
+        errorMsg += "  actual capacity expected 16\n";
+
+        assertEquals(errorMsg, 16, capacity);
+
+        ArrayDeque<Integer> ad2 = new ArrayDeque<>();
+        for (int i = 0; i < 8; i++) {
+            ad2.addFirst(0);
+        }
+        for (int i = 0; i < 8; i++) {
+            ad2.removeFirst();
+        }
+        int capacity2 = ad2.getCapacity();
+        String errorMsg2 = "  Bad capacity returned when removing from ArrayDeque.\n";
+        errorMsg2 += "  student capacity returned " + capacity2 + "\n";
+        errorMsg2 += "  actual capacity expected 16\n";
+
+        assertEquals(errorMsg2, 16, capacity2);
+    }
 }

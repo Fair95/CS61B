@@ -124,7 +124,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 		front = (front == capacity - 1) ? 0 : front + 1;
 		T returnValue = arr[front];
 		size--;
-		if (size < capacity / 4 && size > 16) {
+		if (size < capacity / 4 && size >= 4) {
 			shrinkArray();
 		}
 		return returnValue;
@@ -136,7 +136,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 		back = (back == 0) ? capacity - 1 : back - 1;
 		T returnValue = arr[back];
 		size--;
-		if (size < capacity / 4 && size >= 16) {
+		if (size < capacity / 4 && size >= 4) {
 			shrinkArray();
 		}
 		return returnValue;
@@ -184,5 +184,8 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 			return true;
 		}
 		return false;
+	}
+	public int getCapacity(){
+		return capacity;
 	}
 }
