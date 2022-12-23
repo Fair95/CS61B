@@ -89,11 +89,14 @@ public class TestBSTMapExtra {
         rightChild.put('A', 1);
         rightChild.put('B', 2);
         Integer result = (Integer) rightChild.remove('A');
+        assertEquals(rightChild.size(), 1);
         assertTrue(result.equals(new Integer(1)));
         for (int i = 0; i < 10; i++) {
             rightChild.put((char) ('C'+i), 3+i);
         }
+        assertEquals(rightChild.size(), 11);
         rightChild.put('A', 100);
+        assertEquals(rightChild.size(), 12);
         assertTrue(((Integer) rightChild.remove('D')).equals(new Integer(4)));
         assertTrue(((Integer) rightChild.remove('G')).equals(new Integer(7)));
         assertTrue(((Integer) rightChild.remove('A')).equals(new Integer(100)));
