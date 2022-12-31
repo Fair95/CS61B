@@ -6,7 +6,6 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.ZoneOffset;
 import java.util.*;
 
 
@@ -57,7 +56,7 @@ public class Commit implements Serializable {
         return Utils.readObject(f, Commit.class);
     }
 
-    public void saveCommit() throws IOException {
+    public void saveCommit() {
         String commitSha = generateSha();
         File dir = Utils.join(Info.COMMIT_DIR, commitSha.substring(0, 2));
         dir.mkdir();

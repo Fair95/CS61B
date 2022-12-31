@@ -9,7 +9,7 @@ public class Branch implements Serializable {
     public String name;
     public Commit HEAD;
     public Map<String, Commit> history = new HashMap<>();
-    Branch() throws IOException {
+    Branch() {
         makeDefaultCommit();
     }
     Branch(String name, Commit HEAD, Map<String, Commit> history){
@@ -17,7 +17,7 @@ public class Branch implements Serializable {
         this.HEAD = HEAD;
         this.history = history;
     }
-    public void makeDefaultCommit() throws IOException {
+    public void makeDefaultCommit() {
         Commit c = new Commit();
         c.saveCommit();
 

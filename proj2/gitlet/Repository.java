@@ -1,13 +1,7 @@
 package gitlet;
 
-import jh61b.junit.In;
-
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.*;
 
 
@@ -29,7 +23,7 @@ public class Repository implements Serializable {
     private Map<String, Branch> branches = new HashMap<>();
     private Branch cur;
     private StagingArea SA;
-    public void setUp() throws IOException {
+    public void setUp() {
         if (Info.GITLET_DIR.isDirectory()) {
             throw new GitletException("A Gitlet version-control system already exists in the current directory.");
         }
@@ -79,7 +73,7 @@ public class Repository implements Serializable {
         }
         return Utils.readObject(Info.REPO, Repository.class);
     }
-    public void add(String file_path) throws IOException {
+    public void add(String file_path) {
         SA.add(file_path, cur.HEAD);
         saveState();
     }
