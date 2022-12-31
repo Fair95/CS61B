@@ -363,6 +363,7 @@ class Utils {
             }
         }
         exit("No commit with that id exists.");
+        return null;
     }
 
     public static void addFileFromNextState(TreeMap<String, String> nextFiles, TreeMap<String, String> curFiles) {
