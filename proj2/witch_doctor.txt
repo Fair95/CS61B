@@ -1,0 +1,5 @@
+<<<<<<< HEAD
+I have forseen the future!
+=======
+Feeling good man!
+>>>>>>>

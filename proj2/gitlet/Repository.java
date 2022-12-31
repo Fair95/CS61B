@@ -5,16 +5,17 @@ import java.io.Serializable;
 import java.util.*;
 
 
-/** Represents a gitlet repository.
+/**
+ * Represents a gitlet repository.
  *  TODO: It's a good idea to give a description here of what else this Class
  *  does at a high level.
  *
- *  @author Qianyi Li
+ * @author Qianyi Li
  */
 public class Repository implements Serializable {
     /**
      * TODO: add instance variables here.
-     *
+     * <p>
      * List all instance variables of the Repository class here with a useful
      * comment above them describing what that variable represents and how that
      * variable is used. We've provided two examples for you.
@@ -23,6 +24,7 @@ public class Repository implements Serializable {
     private Map<String, Branch> branches = new HashMap<>();
     private Branch cur;
     private StagingArea SA;
+
     public void setUp() {
         if (Info.GITLET_DIR.isDirectory()) {
             throw new GitletException("A Gitlet version-control system already exists in the current directory.");
@@ -32,20 +34,20 @@ public class Repository implements Serializable {
             throw new GitletException("Error creating gitlet dir.");
         }
 
-        if(!Info.OBJ_DIR.mkdir()) {
+        if (!Info.OBJ_DIR.mkdir()) {
             throw new GitletException("Error creating objects dir.");
         }
 
-        if(!Info.STAGING_DIR.mkdir()) {
+        if (!Info.STAGING_DIR.mkdir()) {
             throw new GitletException("Error creating staging dir.");
         }
 
-        if(!Info.COMMIT_DIR.mkdir()) {
+        if (!Info.COMMIT_DIR.mkdir()) {
             throw new GitletException("Error creating commits dir.");
         }
 
         Blob blob = new Blob();
-        if (!blob.writeBlob()){
+        if (!blob.writeBlob()) {
             throw new GitletException("Error writing initial blob file.");
         }
 
@@ -61,36 +63,50 @@ public class Repository implements Serializable {
     public boolean isInit() {
         return isInit;
     }
+
     public Map<String, Branch> getBranches() {
         return branches;
     }
+
     public void saveState() {
         Utils.writeObject(Info.REPO, this);
     }
+
     public static Repository getState() {
         if (!Info.REPO.isFile()) {
             throw new GitletException("Not in an initialized Gitlet directory.");
         }
         return Utils.readObject(Info.REPO, Repository.class);
     }
+
     public void add(String file_path) {
-        SA.add(file_path, cur.HEAD);
+        SA.add(file_path);
         saveState();
     }
+
     public void commit(String msg) {
         cur.HEAD = cur.commit(msg, SA);
         SA.clean();
         SA = new StagingArea(cur.HEAD);
         saveState();
     }
+
+    public void mergeCommit(String msg, String secondParentSha) {
+        cur.HEAD = cur.mergeCommit(msg, SA, secondParentSha);
+        SA.clean();
+        SA = new StagingArea(cur.HEAD);
+        saveState();
+    }
+
     public void rm(String file_path) {
         SA.remove(file_path, cur.HEAD);
         saveState();
     }
+
     public void log() {
         Commit c = cur.HEAD;
         String parentSha = c.getParentSha();
-        while (!parentSha.isEmpty()){
+        while (!parentSha.isEmpty()) {
             c.printCommit();
             c = Commit.readCommit(parentSha);
             parentSha = c.getParentSha();
@@ -107,7 +123,7 @@ public class Repository implements Serializable {
             allCommits = Utils.plainFilenamesIn(Utils.join(Info.COMMIT_DIR, dir));
             assert allCommits != null;
             for (String s : allCommits) {
-                c = Commit.readCommit(dir+s);
+                c = Commit.readCommit(dir + s);
                 c.printCommit();
             }
         }
@@ -130,13 +146,13 @@ public class Repository implements Serializable {
             allCommits = Utils.plainFilenamesIn(Utils.join(Info.COMMIT_DIR, dir));
             assert allCommits != null;
             for (String s : allCommits) {
-                c = Commit.readCommit(dir+s);
+                c = Commit.readCommit(dir + s);
                 if (c.getMsg().equals(msg)) {
                     found.append(c.generateSha()).append("\n");
                 }
             }
         }
-        if (found.length()==0){
+        if (found.length() == 0) {
             throw new GitletException("Found no commit with that message.");
         } else {
             System.out.print(found);
@@ -158,7 +174,7 @@ public class Repository implements Serializable {
         // staged files
         statusBuilder.append("=== Staged Files ===").append("\n");
         TreeMap<String, String> stagedFiles = SA.getStagedFiles();
-        for (String filename : stagedFiles.keySet()){
+        for (String filename : stagedFiles.keySet()) {
             if (Utils.isInStagingArea(filename)) {
                 statusBuilder.append(filename).append("\n");
                 statusBuilder.append("\n");
@@ -168,7 +184,7 @@ public class Repository implements Serializable {
         // removed files
         statusBuilder.append("=== Removed Files ===").append("\n");
         HashSet<String> removedFiles = SA.getRemovedFiles();
-        for (String s : removedFiles){
+        for (String s : removedFiles) {
             statusBuilder.append(s).append("\n");
         }
         statusBuilder.append("\n");
@@ -198,8 +214,8 @@ public class Repository implements Serializable {
         saveState();
     }
 
-    public void checkoutFileInCommit(String commitID, String filename) {
-        Commit c = Utils.findCommit(commitID);
+    public void checkoutFileInCommit(String commitSha, String filename) {
+        Commit c = Utils.findCommit(commitSha);
         TreeMap<String, String> files = c.getFiles();
         if (!files.containsKey(filename)) {
             throw new GitletException("File does not exist in that commit.");
@@ -209,10 +225,10 @@ public class Repository implements Serializable {
     }
 
     public void checkoutBranch(String branchName) {
-        if (!branches.containsKey(branchName)){
+        if (!branches.containsKey(branchName)) {
             System.out.println("No such branch exists.");
         }
-        if (branchName.equals(cur.name)){
+        if (branchName.equals(cur.name)) {
             System.out.println("No need to checkout the current branch.");
         }
         Branch next = branches.get(branchName);
@@ -226,27 +242,28 @@ public class Repository implements Serializable {
         saveState();
     }
 
-    public void makeBranch(String name){
-        if (branches.containsKey(name)){
+    public void makeBranch(String name) {
+        if (branches.containsKey(name)) {
             throw new GitletException("A branch with that name already exists.");
         }
         Branch b = new Branch(name, cur.HEAD, cur.history);
         branches.put(b.name, b);
         saveState();
     }
+
     public void deleteBranch(String name) {
-        if (!branches.containsKey(name)){
+        if (!branches.containsKey(name)) {
             throw new GitletException("A branch with that name does not exist.");
         }
-        if (cur.name.equals(name)){
+        if (cur.name.equals(name)) {
             throw new GitletException("Cannot remove the current branch.");
         }
         branches.remove(name);
         saveState();
     }
 
-    public void reset(String commitID) {
-        Commit next = Utils.findCommit(commitID);
+    public void reset(String commitSha) {
+        Commit next = Utils.findCommit(commitSha);
         TreeMap<String, String> nextFiles = next.getFiles();
         TreeMap<String, String> curFiles = cur.HEAD.getFiles();
 
@@ -259,6 +276,124 @@ public class Repository implements Serializable {
         saveState();
     }
 
-    public void merge(String arg) {
+    public void merge(String branchName) {
+        if (!Utils.plainFilenamesIn(Info.STAGING_DIR).isEmpty() || !SA.getRemovedFiles().isEmpty()) {
+            throw new GitletException("You have uncommitted changes.");
+        }
+        if (!branches.containsKey(branchName)) {
+            throw new GitletException("A branch with that name does not exist.");
+        }
+        if (branchName.equals(cur.name)) {
+            throw new GitletException("Cannot merge a branch with itself.");
+        }
+        Commit target = branches.get(branchName).HEAD;
+        Commit ancestor = Utils.getLatestCommonAncestor(cur.HEAD, target);
+        boolean conflict = false;
+        if (ancestor.equals(target)) {
+            System.out.println("Given branch is an ancestor of the current branch.");
+        } else if (ancestor.equals(cur.HEAD)) {
+            checkoutBranch(branchName);
+            System.out.println("Current branch fast-forwarded.");
+        } else {
+            TreeMap<String, String> targetFiles = target.getFiles();
+            TreeMap<String, String> curFiles = cur.HEAD.getFiles();
+            TreeMap<String, String> ancestorFiles = ancestor.getFiles();
+            HashSet<String> allFiles = new HashSet<>();
+            allFiles.addAll(targetFiles.keySet());
+            allFiles.addAll(curFiles.keySet());
+            allFiles.addAll(ancestorFiles.keySet());
+            for (String file : allFiles) {
+                String targetFileSha;
+                String curFileSha;
+                String ancestorFileSha;
+                // file exists in ancestor
+                if (ancestorFiles.containsKey(file)) {
+                    ancestorFileSha = ancestorFiles.get(file);
+                    if (curFiles.containsKey(file) && !targetFiles.containsKey(file)) {
+                        curFileSha = curFiles.get(file);
+                        if (curFileSha.equals(ancestorFileSha)) {
+                            // 6. Unmodified in current branch but deleted in target branch
+                            SA.remove(file, cur.HEAD);
+                        } else {
+                            // 8. modified in current branch and deleted in target branchy
+                            Utils.writeConflictMsg(file, curFileSha, null);
+                            SA.add(file);
+                            conflict = true;
+                        }
+                    } else if (!curFiles.containsKey(file) && targetFiles.containsKey(file)) {
+                        targetFileSha = targetFiles.get(file);
+                        if (targetFileSha.equals(ancestorFileSha)) {
+                            // 7. Unmodified in target branch but deleted in current branch
+                            // Do nothing
+                        } else {
+                            // 8. modified in target branch and deleted in current branch
+                            Utils.writeConflictMsg(file, null, targetFileSha);
+                            SA.add(file);
+                            conflict = true;
+                        }
+
+                    } else if (targetFiles.containsKey(file) && curFiles.containsKey(file)) {
+                        // file exists in all 3 commits
+                        targetFileSha = targetFiles.get(file);
+                        curFileSha = curFiles.get(file);
+                        ancestorFileSha = ancestorFiles.get(file);
+                        if (!curFileSha.equals(targetFileSha) && curFileSha.equals(ancestorFileSha)) {
+                            // 1. only modified in the target branch
+                            if (Utils.isInCWD(file)) {
+                                throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
+                            }
+                            Utils.writeObjToCWD(targetFileSha, file);
+                            SA.add(file);
+                        } else if (!curFileSha.equals(targetFileSha) && targetFileSha.equals(ancestorFileSha)) {
+                            // 2. only modified in the current branch
+                            // Do nothing
+                        } else if (curFileSha.equals(targetFileSha) && !curFileSha.equals(ancestorFileSha)) {
+                            // 3. modified in both target and current branch but in the same way
+                            // Do nothing
+                        } else if (!curFileSha.equals(targetFileSha)) {
+                            // 8. modified in both target and current branch but in different way
+                            Utils.writeConflictMsg(file, curFileSha, targetFileSha);
+                            SA.add(file);
+                            conflict = true;
+                        } else {
+                            // all files the same
+                        }
+                    } else {
+                        // 3. deleted in both target and current branch
+                        // Do nothing
+                    }
+                } else {
+                    // Not in ancestor
+                    if (!targetFiles.containsKey(file)) {
+                        // 4. Only present in current branch
+                        // Do nothing
+                    } else if (!curFiles.containsKey(file)) {
+                        // 5. Only present in target branch
+                        targetFileSha = targetFiles.get(file);
+                        if (Utils.isInCWD(file)) {
+                            throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
+                        }
+                        Utils.writeObjToCWD(targetFileSha, file);
+                        SA.add(file);
+                    } else {
+                        // Both has the file
+                        targetFileSha = targetFiles.get(file);
+                        curFileSha = curFiles.get(file);
+                        if (!targetFileSha.equals(curFileSha)) {
+                            // 8. modified in both target and current branch but in different way
+                            Utils.writeConflictMsg(file, curFileSha, targetFileSha);
+                            SA.add(file);
+                            conflict = true;
+                        }
+                    }
+                }
+            }
+            String msg = String.format("Merged %s into %s.", branchName, cur.name);
+            mergeCommit(msg, target.generateSha());
+            if (conflict) {
+                System.out.println("Encountered a merge conflict.");
+            }
+        }
+        saveState();
     }
 }

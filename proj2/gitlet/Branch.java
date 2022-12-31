@@ -30,6 +30,11 @@ public class Branch implements Serializable {
         history.put(c.generateSha(), c);
         return c;
     }
+    public Commit mergeCommit(String msg, StagingArea SA, String secondParentSha) {
+        Commit c = HEAD.makeMergeCommit(SA, msg, secondParentSha);
+        history.put(c.generateSha(), c);
+        return c;
+    }
 
     public Map<String, Commit> getHistory() {
         return history;

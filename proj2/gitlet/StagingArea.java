@@ -18,8 +18,7 @@ public class StagingArea implements Serializable {
     public String generateSha() {
         return Utils.sha1(stagedFiles.toString());
     }
-
-    public void add(String path, Commit HEAD) {
+    public void add(String path) {
         File f = new File(path);
         if (!f.isFile()) {
             throw new GitletException("File does not exist.");
@@ -86,11 +85,8 @@ public class StagingArea implements Serializable {
         }
         // if currently tracked, try remove it from cwd if it is not removed
         if (HEAD.getFiles().containsKey(path)) {
-            File f = new File(path);
+            Utils.deleteFileFromCWD(path);
             removedFiles.add(path);
-            if (f.isFile()) {
-                f.delete();
-            }
         }
     }
 

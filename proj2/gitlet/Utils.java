@@ -386,4 +386,72 @@ class Utils {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM d HH:mm:ss yyyy Z");
         return t.format(formatter);
     }
+
+    public static Commit getLatestCommonAncestor(Commit commit1, Commit commit2){
+        // We assume the time always flows forwards (The law of physics!)
+        Comparator<Commit> cmp = Comparator.comparing(Commit::getTime);
+        HashSet<String> commitHashSet;
+        while (!commit1.equals(commit2)) {
+            while (cmp.compare(commit1, commit2) != 0) {
+                // commit1 is generated earlier
+                if (cmp.compare(commit1, commit2) < 0) {
+                    commit2 = commit2.getParentCommit();
+                } else {
+                    // commit2 is generated earlier
+                    commit1 = commit1.getParentCommit();
+                }
+            }
+            // Boarder case:
+            // commit has the same generation time, but not the same commit
+            // Try to find the common latest ancestor until we found or the ancestors are of different time
+            if (!commit1.equals(commit2)){
+                commitHashSet = new HashSet<>();
+                commitHashSet.add(commit1.generateSha());
+                commitHashSet.add(commit2.generateSha());
+                String commit1AncestorSha = commit1.getParentSha();
+                Commit commit1Ancestor = Commit.readCommit(commit1AncestorSha);
+                // Loop through ancestors of commit1
+                while (cmp.compare(commit1, commit1Ancestor) == 0){
+                    // Still same generation time, check if common, otherwise go one level up further
+                    if (commitHashSet.contains(commit1AncestorSha)) {
+                        return commit1Ancestor;
+                    } else {
+                        commitHashSet.add(commit1AncestorSha);
+                        commit1AncestorSha = commit1Ancestor.getParentSha();
+                        commit1Ancestor = Commit.readCommit(commit1AncestorSha);
+                    }
+                }
+                String commit2AncestorSha = commit2.getParentSha();
+                Commit commit2Ancestor = Commit.readCommit(commit2AncestorSha);
+                // Loop through ancestors of commit1
+                while (cmp.compare(commit2, commit2Ancestor) == 0){
+                    if (commitHashSet.contains(commit2AncestorSha)) {
+                        return commit2Ancestor;
+                    } else {
+                        commitHashSet.add(commit2AncestorSha);
+                        commit2AncestorSha = commit2Ancestor.getParentSha();
+                        commit2Ancestor = Commit.readCommit(commit2AncestorSha);
+                    }
+                }
+                // Not found, start from their respective ancestors
+                commit1 = commit1Ancestor;
+                commit2 = commit2Ancestor;
+            }
+        }
+        return commit1;
+    }
+
+    public static void writeConflictMsg(String cwdFile, String curFile, String targetFile){
+        StringBuilder builder = new StringBuilder();
+        builder.append("<<<<<<< HEAD\n");
+        if (curFile!=null) {
+            builder.append(readContentsAsString(join(Info.OBJ_DIR, curFile)));
+        }
+        builder.append("=======\n");
+        if (targetFile!=null) {
+            builder.append(readContentsAsString(join(Info.OBJ_DIR, targetFile)));
+        }
+        builder.append(">>>>>>>\n");
+        writeContents(join(Info.CWD, cwdFile), builder.toString());
+    }
 }
