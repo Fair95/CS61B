@@ -14,7 +14,7 @@ public class Main {
      * Usage: java gitlet.Main ARGS, where ARGS contains
      * <COMMAND> <OPERAND1> <OPERAND2> ...
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         // if no argument provided
         if (args.length == 0) {
             Utils.exitWithError("Please enter a command.");

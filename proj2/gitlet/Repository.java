@@ -77,7 +77,7 @@ public class Repository implements Serializable {
         SA.add(file_path, cur.HEAD);
         saveState();
     }
-    public void commit(String msg) throws IOException {
+    public void commit(String msg) {
         cur.HEAD = cur.commit(msg, SA);
         SA.clean();
         SA = new StagingArea(cur.HEAD);

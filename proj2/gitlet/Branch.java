@@ -25,7 +25,7 @@ public class Branch implements Serializable {
         history.put(c.generateSha(), c);
         HEAD = c;
     }
-    public Commit commit(String msg, StagingArea SA) throws IOException {
+    public Commit commit(String msg, StagingArea SA) {
         Commit c = HEAD.makeCommit(SA, msg);
         history.put(c.generateSha(), c);
         return c;
