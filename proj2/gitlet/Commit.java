@@ -81,7 +81,7 @@ public class Commit implements Serializable {
         files = new TreeMap<>();
     }
 
-    public Commit makeCommit(StagingArea SA, String msg) throws IOException {
+    public Commit makeCommit(StagingArea SA, String msg) {
         if (msg.isEmpty()) {
             throw new GitletException("Please enter a commit message.");
         }
