@@ -350,11 +350,11 @@ class Utils {
     public static Commit findCommit(String commitID) {
         Commit c;
         if (commitID.length() < 3) {
-            throw new GitletException("Too short commit ID");
+            exit("Too short commit ID");
         }
         File commitDir = Utils.join(Info.COMMIT_DIR, commitID.substring(0, 2));
         if (!commitDir.isDirectory()) {
-            throw new GitletException("No commit with that id exists.");
+            exit("No commit with that id exists.");
         }
         for (String s : Objects.requireNonNull(plainFilenamesIn(commitDir))) {
             if (s.startsWith(commitID.substring(2))) {
@@ -362,13 +362,13 @@ class Utils {
                 return c;
             }
         }
-        throw new GitletException("No commit with that id exists.");
+        exit("No commit with that id exists.");
     }
 
     public static void addFileFromNextState(TreeMap<String, String> nextFiles, TreeMap<String, String> curFiles) {
         for (String filename : nextFiles.keySet()) {
             if (!curFiles.containsKey(filename) && Utils.join(Info.CWD, filename).isFile()) {
-                throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
+                exit("There is an untracked file in the way; delete it, or add and commit it first.");
             }
             writeObjToCWD(nextFiles.get(filename), filename);
         }
@@ -454,4 +454,10 @@ class Utils {
         builder.append(">>>>>>>\n");
         writeContents(join(Info.CWD, cwdFile), builder.toString());
     }
+
+    public static void exit(String message, Object... args) {
+        message(message, args);
+        System.exit(0);
+    }
+
 }

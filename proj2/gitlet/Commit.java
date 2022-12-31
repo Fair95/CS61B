@@ -59,7 +59,7 @@ public class Commit implements Serializable {
 //        System.out.println();
         if (!dir.isDirectory()) {
 //            System.out.println(dir);
-            throw new GitletException("Commit not exists.");
+            Utils.exit("Commit not exists.");
         }
         File f = Utils.join(dir, sha.substring(2));
         return Utils.readObject(f, Commit.class);
@@ -93,11 +93,11 @@ public class Commit implements Serializable {
 
     public Commit makeCommit(StagingArea SA, String msg) {
         if (msg.isEmpty()) {
-            throw new GitletException("Please enter a commit message.");
+            Utils.exit("Please enter a commit message.");
         }
         if (SA.generateSha().equals(this.generateFileSha())) {
             // if the stagedFile is the same as HEAD tracked files (i.e. same sha) => nothing has changed
-            throw new GitletException("No changes added to the commit.");
+            Utils.exit("No changes added to the commit.");
         }
         // Create a new commit node with stagedFiles as tracked files
         ZonedDateTime time = ZonedDateTime.now();
@@ -121,11 +121,11 @@ public class Commit implements Serializable {
     }
     public Commit makeMergeCommit(StagingArea SA, String msg, String second_parent_sha){
         if (msg.isEmpty()) {
-            throw new GitletException("Please enter a commit message.");
+            Utils.exit("Please enter a commit message.");
         }
         if (SA.generateSha().equals(this.generateFileSha())) {
             // if the stagedFile is the same as HEAD tracked files (i.e. same sha) => nothing has changed
-            throw new GitletException("No changes added to the commit.");
+            Utils.exit("No changes added to the commit.");
         }
         // Create a new commit node with stagedFiles as tracked files
         ZonedDateTime time = ZonedDateTime.now();
@@ -191,7 +191,7 @@ public class Commit implements Serializable {
     public Commit getParentCommit(){
         String parentSha = getParentSha();
         if (parentSha.equals("")) {
-            throw new GitletException("No parent found! It is the root commit");
+            Utils.exit("No parent found! It is the root commit");
         }
         return Commit.readCommit(parentSha);
     }

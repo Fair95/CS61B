@@ -21,7 +21,7 @@ public class StagingArea implements Serializable {
     public void add(String path) {
         File f = new File(path);
         if (!f.isFile()) {
-            throw new GitletException("File does not exist.");
+            Utils.exit("File does not exist.");
         }
         String targetFileSha = Utils.encodeFile(path);
         Blob blob = Blob.readBlob();
@@ -75,7 +75,7 @@ public class StagingArea implements Serializable {
     public void remove(String path, Commit HEAD) {
         // Neither staged for removal nor tracked in current HEAD commit
         if (!stagedFiles.containsKey(path) && !HEAD.getFiles().containsKey(path)) {
-            throw new GitletException("No reason to remove the file.");
+            Utils.exit("No reason to remove the file.");
         }
         // if staged for track for the next commit node, remove it (i.e. staged for removal)
         if (stagedFiles.containsKey(path)) {

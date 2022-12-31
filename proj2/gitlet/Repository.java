@@ -27,28 +27,28 @@ public class Repository implements Serializable {
 
     public void setUp() {
         if (Info.GITLET_DIR.isDirectory()) {
-            throw new GitletException("A Gitlet version-control system already exists in the current directory.");
+            Utils.exit("A Gitlet version-control system already exists in the current directory.");
         }
 
         if (!Info.GITLET_DIR.mkdir()) {
-            throw new GitletException("Error creating gitlet dir.");
+            Utils.exit("Error creating gitlet dir.");
         }
 
         if (!Info.OBJ_DIR.mkdir()) {
-            throw new GitletException("Error creating objects dir.");
+            Utils.exit("Error creating objects dir.");
         }
 
         if (!Info.STAGING_DIR.mkdir()) {
-            throw new GitletException("Error creating staging dir.");
+            Utils.exit("Error creating staging dir.");
         }
 
         if (!Info.COMMIT_DIR.mkdir()) {
-            throw new GitletException("Error creating commits dir.");
+            Utils.exit("Error creating commits dir.");
         }
 
         Blob blob = new Blob();
         if (!blob.writeBlob()) {
-            throw new GitletException("Error writing initial blob file.");
+            Utils.exit("Error writing initial blob file.");
         }
 
         cur = new Branch();
@@ -74,7 +74,7 @@ public class Repository implements Serializable {
 
     public static Repository getState() {
         if (!Info.REPO.isFile()) {
-            throw new GitletException("Not in an initialized Gitlet directory.");
+            Utils.exit("Not in an initialized Gitlet directory.");
         }
         return Utils.readObject(Info.REPO, Repository.class);
     }
@@ -153,7 +153,7 @@ public class Repository implements Serializable {
             }
         }
         if (found.length() == 0) {
-            throw new GitletException("Found no commit with that message.");
+            Utils.exit("Found no commit with that message.");
         } else {
             System.out.print(found);
         }
@@ -180,6 +180,7 @@ public class Repository implements Serializable {
                 statusBuilder.append("\n");
             }
         }
+        statusBuilder.append("\n");
 
         // removed files
         statusBuilder.append("=== Removed Files ===").append("\n");
@@ -208,7 +209,7 @@ public class Repository implements Serializable {
     public void checkoutFile(String filename) {
         TreeMap<String, String> files = cur.HEAD.getFiles();
         if (!files.containsKey(filename)) {
-            throw new GitletException("File does not exist in that commit.");
+            Utils.exit("File does not exist in that commit.");
         }
         Utils.writeObjToCWD(files.get(filename), filename);
         saveState();
@@ -218,7 +219,7 @@ public class Repository implements Serializable {
         Commit c = Utils.findCommit(commitSha);
         TreeMap<String, String> files = c.getFiles();
         if (!files.containsKey(filename)) {
-            throw new GitletException("File does not exist in that commit.");
+            Utils.exit("File does not exist in that commit.");
         }
         Utils.writeObjToCWD(files.get(filename), filename);
         saveState();
@@ -227,9 +228,11 @@ public class Repository implements Serializable {
     public void checkoutBranch(String branchName) {
         if (!branches.containsKey(branchName)) {
             System.out.println("No such branch exists.");
+            return;
         }
         if (branchName.equals(cur.name)) {
             System.out.println("No need to checkout the current branch.");
+            return;
         }
         Branch next = branches.get(branchName);
         TreeMap<String, String> curFiles = cur.HEAD.getFiles();
@@ -244,7 +247,7 @@ public class Repository implements Serializable {
 
     public void makeBranch(String name) {
         if (branches.containsKey(name)) {
-            throw new GitletException("A branch with that name already exists.");
+            Utils.exit("A branch with that name already exists.");
         }
         Branch b = new Branch(name, cur.HEAD, cur.history);
         branches.put(b.name, b);
@@ -253,10 +256,10 @@ public class Repository implements Serializable {
 
     public void deleteBranch(String name) {
         if (!branches.containsKey(name)) {
-            throw new GitletException("A branch with that name does not exist.");
+            Utils.exit("A branch with that name does not exist.");
         }
         if (cur.name.equals(name)) {
-            throw new GitletException("Cannot remove the current branch.");
+            Utils.exit("Cannot remove the current branch.");
         }
         branches.remove(name);
         saveState();
@@ -278,13 +281,13 @@ public class Repository implements Serializable {
 
     public void merge(String branchName) {
         if (!Utils.plainFilenamesIn(Info.STAGING_DIR).isEmpty() || !SA.getRemovedFiles().isEmpty()) {
-            throw new GitletException("You have uncommitted changes.");
+            Utils.exit("You have uncommitted changes.");
         }
         if (!branches.containsKey(branchName)) {
-            throw new GitletException("A branch with that name does not exist.");
+            Utils.exit("A branch with that name does not exist.");
         }
         if (branchName.equals(cur.name)) {
-            throw new GitletException("Cannot merge a branch with itself.");
+            Utils.exit("Cannot merge a branch with itself.");
         }
         Commit target = branches.get(branchName).HEAD;
         Commit ancestor = Utils.getLatestCommonAncestor(cur.HEAD, target);
@@ -340,7 +343,7 @@ public class Repository implements Serializable {
                         if (!curFileSha.equals(targetFileSha) && curFileSha.equals(ancestorFileSha)) {
                             // 1. only modified in the target branch
                             if (Utils.isInCWD(file)) {
-                                throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
+                                Utils.exit("There is an untracked file in the way; delete it, or add and commit it first.");
                             }
                             Utils.writeObjToCWD(targetFileSha, file);
                             SA.add(file);
@@ -371,7 +374,7 @@ public class Repository implements Serializable {
                         // 5. Only present in target branch
                         targetFileSha = targetFiles.get(file);
                         if (Utils.isInCWD(file)) {
-                            throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
+                            Utils.exit("There is an untracked file in the way; delete it, or add and commit it first.");
                         }
                         Utils.writeObjToCWD(targetFileSha, file);
                         SA.add(file);
