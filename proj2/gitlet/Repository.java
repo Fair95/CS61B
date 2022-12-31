@@ -21,7 +21,7 @@ public class Repository implements Serializable {
      * variable is used. We've provided two examples for you.
      */
     private boolean isInit = false;
-    private Map<String, Branch> branches = new HashMap<>();
+    private Map<String, Branch> branches = new TreeMap<>();
     private Branch cur;
     private StagingArea SA;
 
@@ -177,14 +177,13 @@ public class Repository implements Serializable {
         for (String filename : stagedFiles.keySet()) {
             if (Utils.isInStagingArea(filename)) {
                 statusBuilder.append(filename).append("\n");
-                statusBuilder.append("\n");
             }
         }
         statusBuilder.append("\n");
 
         // removed files
         statusBuilder.append("=== Removed Files ===").append("\n");
-        HashSet<String> removedFiles = SA.getRemovedFiles();
+        TreeSet<String> removedFiles = SA.getRemovedFiles();
         for (String s : removedFiles) {
             statusBuilder.append(s).append("\n");
         }

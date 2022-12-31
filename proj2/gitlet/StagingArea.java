@@ -8,7 +8,7 @@ import java.util.*;
 public class StagingArea implements Serializable {
     // {file_path: sha}
     private TreeMap<String, String> stagedFiles;
-    private HashSet<String> removedFiles = new HashSet<>();
+    private TreeSet<String> removedFiles = new TreeSet<>();
 
     @SuppressWarnings("unchecked")
     StagingArea(Commit HEAD) {
@@ -94,7 +94,7 @@ public class StagingArea implements Serializable {
         return stagedFiles;
     }
 
-    public HashSet<String> getRemovedFiles() {
+    public TreeSet<String> getRemovedFiles() {
         return removedFiles;
     }
 }
