@@ -347,9 +347,6 @@ public class Repository implements Serializable {
                         ancestorFileSha = ancestorFiles.get(file);
                         if (!curFileSha.equals(targetFileSha) && curFileSha.equals(ancestorFileSha)) {
                             // 1. only modified in the target branch
-                            if (Utils.isInCWD(file)) {
-                                Utils.exit("There is an untracked file in the way; delete it, or add and commit it first."+file);
-                            }
                             Utils.writeObjToCWD(targetFileSha, file);
                             SA.add(file);
                         } else if (!curFileSha.equals(targetFileSha) && targetFileSha.equals(ancestorFileSha)) {
