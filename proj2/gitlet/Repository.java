@@ -376,7 +376,7 @@ public class Repository implements Serializable {
                         // 5. Only present in target branch
                         targetFileSha = targetFiles.get(file);
                         if (Utils.isInCWD(file)) {
-                            Utils.exit("There is an untracked file in the way; delete it, or add and commit it first."+file);
+                            Utils.exit("There is an untracked file in the way; delete it, or add and commit it first.");
                         }
                         Utils.writeObjToCWD(targetFileSha, file);
                         SA.add(file);
