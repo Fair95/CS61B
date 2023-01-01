@@ -1,5 +1,6 @@
 package gitlet;
 
+
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -388,57 +389,94 @@ class Utils {
         return t.format(formatter);
     }
 
+//    public static Commit getLatestCommonAncestor(Commit commit1, Commit commit2){
+//        // We assume the time always flows forwards (The law of physics!)
+//        Comparator<Commit> cmp = Comparator.comparing(Commit::getTime);
+//        PriorityQueue<Commit> pq = new PriorityQueue<>();
+//        HashSet<String> commitHashSet;
+//        while (!commit1.equals(commit2)) {
+//            while (cmp.compare(commit1, commit2) != 0) {
+//                // commit1 is generated earlier
+//                if (cmp.compare(commit1, commit2) < 0) {
+//                    commit2 = commit2.getParentCommit();
+//                } else {
+//                    // commit2 is generated earlier
+//                    commit1 = commit1.getParentCommit();
+//                }
+//            }
+//            // Boarder case:
+//            // commit has the same generation time, but not the same commit
+//            // Try to find the common latest ancestor until we found or the ancestors are of different time
+//            if (!commit1.equals(commit2)){
+//                commitHashSet = new HashSet<>();
+//                commitHashSet.add(commit1.generateSha());
+//                commitHashSet.add(commit2.generateSha());
+//                String commit1AncestorSha = commit1.getParentSha();
+//                Commit commit1Ancestor = Commit.readCommit(commit1AncestorSha);
+//                // Loop through ancestors of commit1
+//                while (cmp.compare(commit1, commit1Ancestor) == 0){
+//                    // Still same generation time, check if common, otherwise go one level up further
+//                    if (commitHashSet.contains(commit1AncestorSha)) {
+//                        return commit1Ancestor;
+//                    } else {
+//                        commitHashSet.add(commit1AncestorSha);
+//                        commit1AncestorSha = commit1Ancestor.getParentSha();
+//                        commit1Ancestor = Commit.readCommit(commit1AncestorSha);
+//                    }
+//                }
+//                String commit2AncestorSha = commit2.getParentSha();
+//                Commit commit2Ancestor = Commit.readCommit(commit2AncestorSha);
+//                // Loop through ancestors of commit1
+//                while (cmp.compare(commit2, commit2Ancestor) == 0){
+//                    if (commitHashSet.contains(commit2AncestorSha)) {
+//                        return commit2Ancestor;
+//                    } else {
+//                        commitHashSet.add(commit2AncestorSha);
+//                        commit2AncestorSha = commit2Ancestor.getParentSha();
+//                        commit2Ancestor = Commit.readCommit(commit2AncestorSha);
+//                    }
+//                }
+//                // Not found, start from their respective ancestors
+//                commit1 = commit1Ancestor;
+//                commit2 = commit2Ancestor;
+//            }
+//        }
+//        return commit1;
+//    }
     public static Commit getLatestCommonAncestor(Commit commit1, Commit commit2){
         // We assume the time always flows forwards (The law of physics!)
-        Comparator<Commit> cmp = Comparator.comparing(Commit::getTime);
-        HashSet<String> commitHashSet;
-        while (!commit1.equals(commit2)) {
-            while (cmp.compare(commit1, commit2) != 0) {
-                // commit1 is generated earlier
-                if (cmp.compare(commit1, commit2) < 0) {
-                    commit2 = commit2.getParentCommit();
-                } else {
-                    // commit2 is generated earlier
-                    commit1 = commit1.getParentCommit();
-                }
-            }
-            // Boarder case:
-            // commit has the same generation time, but not the same commit
-            // Try to find the common latest ancestor until we found or the ancestors are of different time
-            if (!commit1.equals(commit2)){
-                commitHashSet = new HashSet<>();
-                commitHashSet.add(commit1.generateSha());
-                commitHashSet.add(commit2.generateSha());
-                String commit1AncestorSha = commit1.getParentSha();
-                Commit commit1Ancestor = Commit.readCommit(commit1AncestorSha);
-                // Loop through ancestors of commit1
-                while (cmp.compare(commit1, commit1Ancestor) == 0){
-                    // Still same generation time, check if common, otherwise go one level up further
-                    if (commitHashSet.contains(commit1AncestorSha)) {
-                        return commit1Ancestor;
-                    } else {
-                        commitHashSet.add(commit1AncestorSha);
-                        commit1AncestorSha = commit1Ancestor.getParentSha();
-                        commit1Ancestor = Commit.readCommit(commit1AncestorSha);
+        Comparator<Commit> cmp = Comparator.comparing(Commit::getTime).reversed();
+        PriorityQueue<Commit> pq = new PriorityQueue<>(cmp);
+        HashSet<String> commitHashSet = new HashSet<>();
+        pq.add(commit1);
+        pq.add(commit2);
+        String lastCommitSha;
+        Commit lastCommit;
+        String lastCommitParentSha;
+        Commit lastCommitParent;
+        String lastCommitSecondParentSha;
+        Commit lastCommitSecondParent;
+
+        while (!pq.isEmpty()){
+            lastCommit = pq.poll();
+            lastCommitSha = lastCommit.generateSha();
+            if (commitHashSet.contains(lastCommitSha)){
+                return lastCommit;
+            } else {
+                commitHashSet.add(lastCommitSha);
+                lastCommitParentSha = lastCommit.getParentSha();
+                lastCommitSecondParentSha = lastCommit.getSecondParentSha();
+                if (!lastCommitParentSha.isEmpty()) {
+                    lastCommitParent = Commit.readCommit(lastCommitParentSha);
+                    pq.add(lastCommitParent);
+                    if (!lastCommitSecondParentSha.isEmpty()) {
+                        lastCommitSecondParent = Commit.readCommit(lastCommitSecondParentSha);
+                        pq.add(lastCommitSecondParent);
                     }
                 }
-                String commit2AncestorSha = commit2.getParentSha();
-                Commit commit2Ancestor = Commit.readCommit(commit2AncestorSha);
-                // Loop through ancestors of commit1
-                while (cmp.compare(commit2, commit2Ancestor) == 0){
-                    if (commitHashSet.contains(commit2AncestorSha)) {
-                        return commit2Ancestor;
-                    } else {
-                        commitHashSet.add(commit2AncestorSha);
-                        commit2AncestorSha = commit2Ancestor.getParentSha();
-                        commit2Ancestor = Commit.readCommit(commit2AncestorSha);
-                    }
-                }
-                // Not found, start from their respective ancestors
-                commit1 = commit1Ancestor;
-                commit2 = commit2Ancestor;
             }
         }
+        System.out.println("Common Ancestor not Found, something wrong.");
         return commit1;
     }
 

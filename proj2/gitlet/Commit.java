@@ -207,4 +207,7 @@ public class Commit implements Serializable {
         return false;
     }
 
+    public String getSecondParentSha() {
+        return second_parent_sha;
+    }
 }

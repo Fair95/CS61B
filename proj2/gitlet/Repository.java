@@ -290,6 +290,12 @@ public class Repository implements Serializable {
         }
         Commit target = branches.get(branchName).HEAD;
         Commit ancestor = Utils.getLatestCommonAncestor(cur.HEAD, target);
+//        System.out.println("");
+//        System.out.println("current sha:" + cur.HEAD.generateSha());
+//        System.out.println("current's parent sha:"+cur.HEAD.getParentSha());
+//        System.out.println("current's 2nd parent sha:"+cur.HEAD.getSecondParentSha());
+//        System.out.println("Ancestor sha:" + ancestor.generateSha());
+//        System.out.println("target sha:" + target.generateSha());
         boolean conflict = false;
         if (ancestor.equals(target)) {
             System.out.println("Given branch is an ancestor of the current branch.");
