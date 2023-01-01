@@ -348,7 +348,7 @@ public class Repository implements Serializable {
                         if (!curFileSha.equals(targetFileSha) && curFileSha.equals(ancestorFileSha)) {
                             // 1. only modified in the target branch
                             if (Utils.isInCWD(file)) {
-                                Utils.exit("There is an untracked file in the way; delete it, or add and commit it first.");
+                                Utils.exit("There is an untracked file in the way; delete it, or add and commit it first."+file);
                             }
                             Utils.writeObjToCWD(targetFileSha, file);
                             SA.add(file);
@@ -379,7 +379,7 @@ public class Repository implements Serializable {
                         // 5. Only present in target branch
                         targetFileSha = targetFiles.get(file);
                         if (Utils.isInCWD(file)) {
-                            Utils.exit("There is an untracked file in the way; delete it, or add and commit it first.");
+                            Utils.exit("There is an untracked file in the way; delete it, or add and commit it first."+file);
                         }
                         Utils.writeObjToCWD(targetFileSha, file);
                         SA.add(file);
